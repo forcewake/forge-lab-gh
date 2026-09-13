@@ -1,1 +1,5 @@
-IiIiRmFyZXdlbGwgaGVscGVyLiIiIgoKX19hbGxfXyA9IFsiZmFyZXdlbGwiXQoKCmRlZiBmYXJld2VsbChuYW1lOiBzdHIpIC0+IHN0cjoKICAgIHJldHVybiBmIkdvb2RieWUsIHtuYW1lfSEiCg==
+"""Farewell helper."""
+
+
+def farewell(name: str) -> str:
+    return f"Goodbye, {name}!"
