@@ -1,0 +1,24 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: count-errors-matches-oracle
+        run: |
+          python3 -c 'from analyze import count_errors
+          raw = sum(
+              1 for line in open('"'"'events.log'"'"', encoding='"'"'utf-8'"'"')
+              if line.startswith('"'"'ERROR'"'"')
+          )
+          got = count_errors('"'"'events.log'"'"')
+          assert got == raw, (got, raw)
+          '
