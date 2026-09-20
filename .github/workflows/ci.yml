@@ -1,0 +1,23 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: unittest-email-validate
+        run: |
+          python3 -m unittest -v test_email_validate
+      - name: test-file-untouched
+        run: |
+          python3 -c 'import hashlib
+          body = open('"'"'test_email_validate.py'"'"', '"'"'rb'"'"').read()
+          assert hashlib.sha256(body).hexdigest() == '"'"'be6000dc034fda26a2f72daf0064028653b434fb6fd9eb2127cdc839c3087cde'"'"'
+          '
