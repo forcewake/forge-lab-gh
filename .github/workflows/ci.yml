@@ -1,0 +1,20 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: greet-contract
+        run: |
+          python3 -c 'from greeting import greet
+          assert greet('"'"'World'"'"') == '"'"'Hello, World!'"'"', greet('"'"'World'"'"')
+          assert greet('"'"'forge'"'"') == '"'"'Hello, forge!'"'"', greet('"'"'forge'"'"')
+          '
