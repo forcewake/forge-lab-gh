@@ -1,0 +1,21 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: retry-config-contract
+        run: |
+          python3 -c 'import settings
+          from client import attempt
+          assert settings.MAX_RETRIES == 3, settings.MAX_RETRIES
+          assert attempt('"'"'/x'"'"') == '"'"'GET /x timeout=30 retries=3'"'"', attempt('"'"'/x'"'"')
+          '
