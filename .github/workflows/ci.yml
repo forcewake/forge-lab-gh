@@ -1,0 +1,23 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: unittest-temperature
+        run: |
+          python3 -m unittest -v test_temperature
+      - name: test-file-untouched
+        run: |
+          python3 -c 'import hashlib
+          body = open('"'"'test_temperature.py'"'"', '"'"'rb'"'"').read()
+          assert hashlib.sha256(body).hexdigest() == '"'"'3051b252e58c23b8532d23cf6beb77cb5d8177d0de34f5a61ca12ef935427636'"'"'
+          '
