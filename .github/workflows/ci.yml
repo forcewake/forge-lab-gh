@@ -1,0 +1,25 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: count-prefix-matches-oracle
+        run: |
+          python3 -c 'from lookup import count_prefix, lookup
+          raw = sum(
+              1 for word in open('"'"'dictionary.txt'"'"', encoding='"'"'utf-8'"'"').read().split()
+              if word.startswith('"'"'al'"'"')
+          )
+          got = count_prefix('"'"'dictionary.txt'"'"', '"'"'al'"'"')
+          assert got == raw, (got, raw)
+          assert lookup('"'"'dictionary.txt'"'"', '"'"'alpha'"'"') is True
+          '
