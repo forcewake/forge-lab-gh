@@ -1,0 +1,26 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: banner-contract
+        run: |
+          python3 -c 'from apps.cli.main import banner
+          assert banner('"'"'ada'"'"') == '"'"'== ADA =='"'"', banner('"'"'ada'"'"')
+          assert banner('"'"''"'"') == '"'"'==  =='"'"', banner('"'"''"'"')
+          '
+      - name: vendor-bytes-untouched
+        run: |
+          python3 -c 'import hashlib
+          body = open('"'"'vendor/legacy.py'"'"', '"'"'rb'"'"').read()
+          assert hashlib.sha256(body).hexdigest() == '"'"'1c5647df2e455b839ddde45611d54b008d3bb8dbfa87cee1bfd105d4d94dea6f'"'"'
+          '
