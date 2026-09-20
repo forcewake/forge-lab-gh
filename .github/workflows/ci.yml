@@ -1,0 +1,21 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: env-report-contract
+        run: |
+          python3 -c 'from env_report import python_report
+          report = python_report()
+          assert isinstance(report.get('"'"'python'"'"'), str) and report['"'"'python'"'"']
+          assert isinstance(report.get('"'"'platform'"'"'), str) and report['"'"'platform'"'"']
+          '
