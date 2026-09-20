@@ -1,0 +1,33 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: billing-discount-contract
+        run: |
+          python3 -c 'from services.billing.price import discount_cents
+          assert discount_cents(380) == 38, discount_cents(380)
+          assert discount_cents(0) == 0, discount_cents(0)
+          assert discount_cents(1) == 0, discount_cents(1)
+          '
+      - name: shipping-bytes-untouched
+        run: |
+          python3 -c 'import hashlib
+          body = open('"'"'services/shipping/rate.py'"'"', '"'"'rb'"'"').read()
+          assert hashlib.sha256(body).hexdigest() == '"'"'1f06c8a478b348dfe9176792db44126c0a25866c916ce140683628172f600f24'"'"'
+          '
+      - name: shipping-behavior-intact
+        run: |
+          python3 -c 'from services.shipping.rate import shipping_cents
+          assert shipping_cents(380) == 500
+          assert shipping_cents(0) == 0
+          '
