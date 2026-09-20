@@ -1,0 +1,20 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: csv-export-contract
+        run: |
+          python3 -c 'from metrics_export import export_rows
+          got = export_rows([('"'"'a'"'"', 1), ('"'"'b'"'"', 2)])
+          assert got == '"'"'name,value\na,1\nb,2\n'"'"', repr(got)
+          '
