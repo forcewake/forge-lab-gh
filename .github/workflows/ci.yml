@@ -1,0 +1,21 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: slugify-contract
+        run: |
+          python3 -c 'from slugify import slugify
+          assert slugify('"'"'Hello World'"'"') == '"'"'hello-world'"'"', slugify('"'"'Hello World'"'"')
+          assert slugify('"'"'foo_bar'"'"') == '"'"'foo-bar'"'"', slugify('"'"'foo_bar'"'"')
+          assert slugify('"'"'A B_C'"'"') == '"'"'a-b-c'"'"', slugify('"'"'A B_C'"'"')
+          '
