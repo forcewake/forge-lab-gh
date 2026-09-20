@@ -1,0 +1,23 @@
+name: cohort-checks
+
+on:
+  pull_request:
+  push:
+
+permissions: {}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: unittest-stringutil
+        run: |
+          python3 -m unittest -v test_stringutil
+      - name: covers-documented-functions
+        run: |
+          python3 -c 'src = open('"'"'test_stringutil.py'"'"', encoding='"'"'utf-8'"'"').read()
+          missing = [n for n in ('"'"'squeeze'"'"', '"'"'is_palindrome'"'"', '"'"'truncate'"'"') if n not in src]
+          assert not missing, missing
+          '
