@@ -1,11 +1,3 @@
-# forge harness lane — DOGFOODING (ADR-0020/0022)
-#
-# This repo is developed THROUGH forge itself: an issue comment /implement
-# (or the "forge" label) plans the work, a human /go consumes the gate, and
-# this dispatch-only workflow runs the coding agent in an ephemeral runner.
-# The lane has NO write credential and NO forge secret; its only output is
-# the candidate artifact the trusted publisher validates and pushes as a
-# Draft PR. The PINNED_REF below tracks main — this repo IS the product.
 # forge harness executor for GitHub Actions (ADR-0016/0019, Stage E3b)
 #
 # Human-applied to the TARGET repository at onboarding (mirrors the GitLab
@@ -41,7 +33,7 @@ on:
         required: true
         type: string
       driver:
-        description: "harness driver: claude-code | grok-build | opencode | copilot"
+        description: "harness driver: claude-code | grok-build | opencode | copilot | claude-sdk-lane | codex-sdk-lane | opencode-sdk-lane"
         required: true
         type: string
       model:
@@ -161,8 +153,6 @@ jobs:
           # The run id the plan comment must mention (tamper guard: another
           # run's plan can never ride this lane's brief).
           FORGE_RUN_ID: ${{ inputs.run_id }}
-          # Bounded verification-failure context on a repair re-dispatch
-          # (empty on cycle 1).
           FORGE_REPAIR_CONTEXT: ${{ inputs.repair_context }}
           # Same source the driver reads: when it carries the `codegraph`
           # server, the brief names its tools AND this step indexes the
@@ -177,7 +167,7 @@ jobs:
           # .forge/bootstrap (ok|failed) for the candidate meta and echoes
           # the FORGE_BOOTSTRAP_FAILED marker into the job log (the
           # control plane's log classifier carries it).
-          pip install "forge @ git+https://github.com/forcewake/forge@main" || {
+          pip install "forge @ git+https://github.com/forcewake/forge@<PINNED_REF>" || {
             echo "failed" > .forge/bootstrap
             echo "FORGE_BOOTSTRAP_FAILED: the pinned forge lane code failed to install (missing tool - infrastructure/config, never code repair)"
             exit 1
@@ -241,13 +231,20 @@ jobs:
           # configuration decision, never detected or enforced here).
           #   claude-code: ANTHROPIC_* (+ ZAI_API_KEY via the
           #     Anthropic-compatible coding endpoint)
+          #   claude-sdk-lane: the same ANTHROPIC_* gateway recipe (EXE-02)
           #   grok-build: FORGE_GROK_AUTH (full ~/.grok/auth.json contents)
           #   opencode: ZAI_API_KEY
+          #   codex-sdk-lane: OPENAI_API_KEY/CODEX_API_KEY (+ FORGE_CODEX_AUTH
+          #     — the optional ChatGPT-login blob)
+          #   opencode-sdk-lane: the same ZAI_API_KEY the batch lane uses
           #   copilot: COPILOT_GITHUB_TOKEN
-          ANTHROPIC_API_KEY: ${{ inputs.driver == 'claude-code' && secrets.ANTHROPIC_API_KEY || '' }}
-          ANTHROPIC_AUTH_TOKEN: ${{ inputs.driver == 'claude-code' && secrets.ANTHROPIC_AUTH_TOKEN || '' }}
-          ANTHROPIC_BASE_URL: ${{ inputs.driver == 'claude-code' && secrets.ANTHROPIC_BASE_URL || '' }}
-          ZAI_API_KEY: ${{ (inputs.driver == 'claude-code' || inputs.driver == 'opencode') && secrets.ZAI_API_KEY || '' }}
+          ANTHROPIC_API_KEY: ${{ (inputs.driver == 'claude-code' || inputs.driver == 'claude-sdk-lane') && secrets.ANTHROPIC_API_KEY || '' }}
+          ANTHROPIC_AUTH_TOKEN: ${{ (inputs.driver == 'claude-code' || inputs.driver == 'claude-sdk-lane') && secrets.ANTHROPIC_AUTH_TOKEN || '' }}
+          ANTHROPIC_BASE_URL: ${{ (inputs.driver == 'claude-code' || inputs.driver == 'claude-sdk-lane') && secrets.ANTHROPIC_BASE_URL || '' }}
+          ZAI_API_KEY: ${{ (inputs.driver == 'opencode' || inputs.driver == 'opencode-sdk-lane') && secrets.ZAI_API_KEY || '' }}
+          OPENAI_API_KEY: ${{ inputs.driver == 'codex-sdk-lane' && secrets.OPENAI_API_KEY || '' }}
+          CODEX_API_KEY: ${{ inputs.driver == 'codex-sdk-lane' && secrets.CODEX_API_KEY || '' }}
+          FORGE_CODEX_AUTH: ${{ inputs.driver == 'codex-sdk-lane' && secrets.FORGE_CODEX_AUTH || '' }}
           FORGE_GROK_AUTH: ${{ inputs.driver == 'grok-build' && secrets.FORGE_GROK_AUTH || '' }}
           COPILOT_GITHUB_TOKEN: ${{ inputs.driver == 'copilot' && secrets.COPILOT_GITHUB_TOKEN || '' }}
           # R15: per-driver CLI version pins (JSON object driver → version;
@@ -272,8 +269,8 @@ jobs:
       - name: Emit candidate artifact
         if: always()
         run: |
-          # Belt and braces for the local exclude: lane infrastructure is
-          # never a deliverable.
+          # Belt and braces for the local exclude: the graph DB (and its
+          # watcher state) is lane infrastructure, never a deliverable.
           rm -rf .codegraph .venv
           rm -rf __pycache__ .pytest_cache
           find . -name '*.pyc' -delete 2>/dev/null || true
