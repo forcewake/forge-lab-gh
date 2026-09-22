@@ -178,7 +178,7 @@ jobs:
           # .forge/bootstrap (ok|failed) for the candidate meta and echoes
           # the FORGE_BOOTSTRAP_FAILED marker into the job log (the
           # control plane's log classifier carries it).
-          pip install "forge @ git+https://github.com/forcewake/forge@17c2d8f" || {
+          pip install "forge @ git+https://github.com/forcewake/forge@deec4ee" || {
             echo "failed" > .forge/bootstrap
             echo "FORGE_BOOTSTRAP_FAILED: the pinned forge lane code failed to install (missing tool - infrastructure/config, never code repair)"
             exit 1
