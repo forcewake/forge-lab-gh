@@ -2,12 +2,11 @@
 
 
 def double(x: int) -> int:
-    """Return twice *x* (intended contract).
+    """Return twice *x*.
 
-    Deliberately wrong first candidate for the controlled CI-repair
-    qualification: this returns ``x + x + 1`` so the independent oracle
-    ``tests/test_double_oracle.py`` fails and supplies the CI test-failure
-    evidence the later repair attempt requires. The repair is to return
-    ``x + x``.
+    Repaired implementation for the controlled CI-repair qualification:
+    the first candidate returned ``x + x + 1`` and failed the independent
+    oracle ``tests/test_double_oracle.py`` in the forge ``unit`` job; this
+    repair returns ``x + x`` so the oracle passes.
     """
-    return x + x + 1
+    return x + x
