@@ -1,5 +1,5 @@
 # Rendered from forcewake/forge templates/github/forge-lane.yml, pinned to the fix branch
-# cursor/e2e-runtime-fixes-8a8d @ 619e7f7 (PR #395, unmerged) for a forge 1.0 live verification.
+# cursor/e2e-runtime-fixes-8a8d @ dc98366 (PR #395, unmerged) for a forge 1.0 live verification.
 name: forge-lane
 run-name: 'forge-lane:${{ fromJSON(inputs.dispatch).forge_run_id }}:${{ fromJSON(inputs.dispatch).attempt }}:${{ fromJSON(inputs.dispatch).generation }}:${{ fromJSON(inputs.dispatch).nonce }}'
 on:
@@ -19,7 +19,7 @@ permissions:
   id-token: write
 jobs:
   lane:
-    uses: forcewake/forge/.github/workflows/lane.yml@619e7f7ae623ba8c6f6ff60a9ff5f8d65d84365f
+    uses: forcewake/forge/.github/workflows/lane.yml@dc9836670a1cd99367f1a9f76bcf4050f2fc55bd
     with:
       dispatch: ${{ inputs.dispatch }}
       requirements_url: ${{ inputs.requirements_url }}
