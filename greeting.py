@@ -8,4 +8,4 @@ def farewell(name: str) -> str:
 
 def wave(name: str) -> str:
     """Return a wave greeting for *name*."""
-    return f"*waves at {name}*"
+    return f"*waves at {name}!*"
